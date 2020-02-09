@@ -22,15 +22,15 @@ on:
 #    types: [started]
 
 env:
-  REPO_URL: https://github.com/coolsnowwolf/lede
+  REPO_URL: https://github.com/openwrt/openwrt
   REPO_BRANCH: master
-  CONFIG_FILE: .config
+  CONFIG_FILE: wr1200js.config
   DIY_SH: diy.sh
   FREE_UP_DISK: false
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
-  TZ: Asia/Shanghai
+  TZ: Asia/Yekaterinburg
 
 jobs:
   build:
