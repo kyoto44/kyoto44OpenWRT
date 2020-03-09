@@ -23,7 +23,7 @@ on:
 
 env:
   REPO_URL: https://github.com/openwrt/openwrt
-  REPO_BRANCH: master
+  REPO_BRANCH: openwrt-18.06
   CONFIG_FILE: wr1200js.config
   DIY_SH: diy.sh
   FREE_UP_DISK: false
@@ -119,5 +119,5 @@ jobs:
       uses: actions/upload-artifact@master
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
-        name: OpenWrt_openwrt-19.07
+        name: OpenWrt_openwrt-18.06
         path: ${{ env.FIRMWARE }}
