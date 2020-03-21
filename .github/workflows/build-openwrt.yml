@@ -13,8 +13,7 @@ on:
     types: [published]
   push:
     branches:
-      - master
-      - ramips-5.4
+      - '*'
     paths:
       - 'wr1200js.config'
 #  schedule:
