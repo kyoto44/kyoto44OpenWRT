@@ -9,6 +9,7 @@
 name: Build OpenWrt based on 5.4 kernel for Youhua WR1200JS
 
 on:
+  repository_dispatch:
   release:
     types: published
   push:
@@ -74,7 +75,7 @@ jobs:
 
     - name: SSH connection to Actions
       uses: P3TERX/debugger-action@master
-      if: env.SSH_ACTIONS == 'true'
+      if: env.SSH_ACTIONS == 'true' || contains(github.event.action, 'ssh')
 
     - name: Download package
       id: package
