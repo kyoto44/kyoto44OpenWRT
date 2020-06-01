@@ -6,30 +6,23 @@
 # Blog: https://p3terx.com
 #=================================================
 
-name: Build OpenWrt
+name: Build OpenWrt based on 5.4 kernel for Youhua WR1200JS
 
 on:
-  release:
-    types: [published]
   push:
     branches:
-      - master
-    paths:
-      - 'wr1200js.config'
-#  schedule:
-#    - cron: 0 8 * * 5
-  watch:
-    types: [started]
+      - '*'
 
 env:
   REPO_URL: https://github.com/openwrt/openwrt
-  REPO_BRANCH: openwrt-18.06
+  REPO_BRANCH: master
   CONFIG_FILE: wr1200js.config
   DIY_SH: diy.sh
   FREE_UP_DISK: false
   SSH_ACTIONS: false
   UPLOAD_BIN_DIR: false
   UPLOAD_FIRMWARE: true
+  UPLOAD_RELEASE: true
   TZ: Asia/Yekaterinburg
 
 jobs:
@@ -98,6 +91,9 @@ jobs:
         echo -e "$(nproc) thread compile"
         make -j$(nproc) || make -j1 V=s
         echo "::set-output name=status::success"
+        grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
+        [ -s DEVICE_NAME ] && echo "::set-env name=DEVICE_NAME::_$(cat DEVICE_NAME)"
+        echo "::set-env name=FILE_DATE::_$(date +"%Y%m%d%H%M")"
 
     - name: Upload bin directory
       uses: actions/upload-artifact@master
@@ -119,5 +115,24 @@ jobs:
       uses: actions/upload-artifact@master
       if: steps.organize.outputs.status == 'success' && !cancelled()
       with:
-        name: OpenWrt_openwrt-18.06
+        name: OpenWrt_master_${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
         path: ${{ env.FIRMWARE }}
+
+    - name: Generate tag
+      id: tag
+      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
+      run: |
+        echo "::set-env name=RELEASE_TAG::$(date +"%Y.%m.%d-%H")"
+        echo "🚀 Auto build OpenWRT Master for YouHua WR1200JS" >> release.txt
+        echo "::set-output name=status::success"
+
+    - name: Upload firmware to release
+      uses: softprops/action-gh-release@v1
+      if: steps.tag.outputs.status == 'success' && !cancelled()
+      env:
+        GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
+      with:
+        tag_name: ${{ env.RELEASE_TAG }}
+        body_path: release.txt
+        files: ${{ env.FIRMWARE }}
+
