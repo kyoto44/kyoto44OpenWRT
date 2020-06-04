@@ -10,3 +10,8 @@
 
 # Modify hostname
 sed -i 's/OpenWrt/YouHua-WR1200JS/g' package/base-files/files/bin/config_generate
+
+# Add custom theme
+cd openwrt/package
+git clone https://github.com/jerrykuku/luci-theme-argon.git  
+cd -
